@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	// "github.com/globalsign/mgo"
 )
 
 var tpl *template.Template
@@ -14,8 +15,8 @@ var tpl *template.Template
 // FormData represents the data sent to the Database
 type FormData struct {
 	Email    string
-	DropDown string
-	TextArea string
+	Password string
+	
 }
 
 func init() {
@@ -24,6 +25,8 @@ func init() {
 
 func main() {
 	r := mux.NewRouter()
+	r.HandleFunc("/index", serveTemplate)
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(".")))
 	r.HandleFunc("/hello", helloHandler)
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
@@ -33,14 +36,16 @@ func main() {
 }
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	email := r.FormValue("email")
-	dropdown := r.FormValue("dropdown")
-	textArea := r.FormValue("text-area")
+	email := r.FormValue("username")
+	password := r.FormValue("password")
 
 	formData := FormData{
 		Email:    email,
-		DropDown: dropdown,
-		TextArea: textArea,
+		Password: password,
 	}
 	fmt.Printf("Found Data %v", formData)
+}
+
+func serveTemplate(w http.ResponseWriter, r *http.Request) {
+	tpl.Execute(w, "index.html")
 }
