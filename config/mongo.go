@@ -33,3 +33,37 @@ func (mongoConfig *Mongo) Load() {
 	mongoConfig.database = os.Getenv("MONGODB_DATABASE")
 	fmt.Println("Read config..all okay")
 }
+
+// Host returns the Mongo host
+func (mongoConfig *Mongo) Host() string {
+	return mongoConfig.host
+}
+
+// Port returns the mongo Port
+func (mongoConfig *Mongo) Port() string {
+	return mongoConfig.port
+}
+
+// RootPassword returns the mongo RootPassword
+func (mongoConfig *Mongo) RootPassword() string {
+	return mongoConfig.rootPassword
+}
+
+// User returns the mongo user
+func (mongoConfig *Mongo) User() string {
+	return mongoConfig.user
+}
+
+// UserPassword returns the mongo userPassword
+func (mongoConfig *Mongo) UserPassword() string {
+	return mongoConfig.userPassword
+}
+
+// Database returns the mongo Database
+func (mongoConfig *Mongo) Database() string {
+	return mongoConfig.database
+}
+// ConnectionString returns a connection string for mongoDial
+func (mongoConfig *Mongo) ConnectionString() string {
+	return fmt.Sprintf("mongodb://%v:%v@%v:%v/%v", mongoConfig.user, mongoConfig.userPassword, mongoConfig.host, mongoConfig.port, mongoConfig.database)
+}
