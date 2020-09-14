@@ -3,8 +3,13 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"net/http"
+	"log"
 	"mongo-golang/config"
+	"mongo-golang/persistent"
+	"mongo-golang/persistent/models"
+	"mongo-golang/service"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	// "github.com/globalsign/mgo"
 )
@@ -22,10 +27,13 @@ func init() {
 }
 
 func main() {
-	r := mux.NewRouter()
-	
-	var mongoConfig  config.Mongo
+
+	var mongoConfig config.Mongo
+
 	mongoConfig.Load()
+	persistent.Init()
+
+	r := mux.NewRouter()
 	r.HandleFunc("/index", serveTemplate)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(".")))
 	r.HandleFunc("/hello", helloHandler)
@@ -37,14 +45,25 @@ func main() {
 }
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("inside hello")
 	email := r.FormValue("username")
 	password := r.FormValue("password")
 
-	formData := FormData{
+	var formData *models.User
+
+	formData = &models.User{
 		Email:    email,
 		Password: password,
 	}
-	fmt.Printf("Found Data %v", formData)
+	if formData != nil {
+		fmt.Printf("Found Data %v", formData)
+		err := service.Init().Auth().Save(formData)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+	log.Fatalln("[ERROR] No data Found")
+
 }
 
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
