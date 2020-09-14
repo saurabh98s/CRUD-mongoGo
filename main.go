@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	"html/template"
-
 	"net/http"
-
+	"mongo-golang/config"
 	"github.com/gorilla/mux"
 	// "github.com/globalsign/mgo"
 )
@@ -16,7 +15,6 @@ var tpl *template.Template
 type FormData struct {
 	Email    string
 	Password string
-	
 }
 
 func init() {
@@ -25,6 +23,9 @@ func init() {
 
 func main() {
 	r := mux.NewRouter()
+	
+	var mongoConfig  config.Mongo
+	mongoConfig.Load()
 	r.HandleFunc("/index", serveTemplate)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(".")))
 	r.HandleFunc("/hello", helloHandler)
